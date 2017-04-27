@@ -3,6 +3,7 @@ package ua.training.lab.userinterface;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import ua.training.lab.service.SubscriberService;
 
@@ -68,6 +69,7 @@ public class UIController {
     private void proceedFileConversion(FileInputStream sourceFileStream, FileInputStream filteringFileStream, File resultFile) {
         //System.out.println("proceedFileConversion() executing");
         new SubscriberService().handle(sourceFileStream, filteringFileStream, resultFile);
+        showDialog(Alert.AlertType.INFORMATION, "Info", "Файл сохранен");
     }
 
     private JFileChooser getFileChooser(){
@@ -86,5 +88,11 @@ public class UIController {
         //resultFileStream = new FileOutputStream(resultFile);
     }
 
-
+    private void showDialog(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.show();
+    }
 }
