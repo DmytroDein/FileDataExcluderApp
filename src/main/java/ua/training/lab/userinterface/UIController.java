@@ -55,20 +55,13 @@ public class UIController {
         JFileChooser chooser = getFileChooser();
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             resultFile = chooser.getSelectedFile();
-            try {
-                initFileStreams();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            //System.out.println(resultFile.getAbsolutePath());
             proceedFileConversion(sourceFileStream, filteringFileStream, resultFile);
         }
-
     }
 
     private void proceedFileConversion(FileInputStream sourceFileStream, FileInputStream filteringFileStream, File resultFile) {
         //System.out.println("proceedFileConversion() executing");
-        new SubscriberService().handle(sourceFileStream, filteringFileStream, resultFile);
+        new SubscriberService().handle(sourceFile, filteringFile, resultFile);
         showDialog(Alert.AlertType.INFORMATION, "Info", "Файл сохранен");
     }
 
@@ -80,7 +73,6 @@ public class UIController {
         chooser.setAcceptAllFileFilterUsed(false);
         return chooser;
     }
-
 
     private void initFileStreams() throws FileNotFoundException {
         sourceFileStream = new FileInputStream(sourceFile);
