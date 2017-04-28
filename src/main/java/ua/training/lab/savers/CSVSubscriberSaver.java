@@ -1,7 +1,6 @@
 package ua.training.lab.savers;
 
 import ua.training.lab.entity.Subscriber;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -17,35 +16,20 @@ public class CSVSubscriberSaver implements SubscriberSaver{
 
     private static final String DELIMITER = ",";
     private static final String FILE_HEADER = "Email Address,First Name,Last Name\n";
-    private BufferedWriter bufferedWriter;
-
-    public CSVSubscriberSaver(File outputFile) {
-        try {
-            this.bufferedWriter = new BufferedWriter(new FileWriter(outputFile));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void save(Collection<Subscriber> uniqueSubscribers, Collection<Subscriber> unSubscribedInSubscribers, File outputFile) {
         List<String> uniqueSubscribersList = prepareStrings(uniqueSubscribers);
-        writeDataToFile(uniqueSubscribersList);
+        writeDataToFile(uniqueSubscribersList, outputFile);
     }
 
-    private void writeDataToFile(List<String> resultArr) {
-        try {
+    private void writeDataToFile(List<String> resultArr, File outputFile) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile))) {
             for (String str : resultArr) {
                 bufferedWriter.write(str);
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                bufferedWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -53,7 +37,7 @@ public class CSVSubscriberSaver implements SubscriberSaver{
         List<String> result = new ArrayList<>();
         result.add(FILE_HEADER);
         result.addAll(uniqueSubscribers.stream()
-                .map(e -> new StringJoiner(",", "", "\n")
+                .map(e -> new StringJoiner(DELIMITER, "", "\n")
                         .add(e.getEmail())
                         .add(e.getFirstName())
                         .add(e.getLastName())
@@ -61,5 +45,4 @@ public class CSVSubscriberSaver implements SubscriberSaver{
                 .collect(Collectors.toList()));
         return result;
     }
-
 }

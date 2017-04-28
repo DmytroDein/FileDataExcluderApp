@@ -17,10 +17,6 @@ public class UIController {
     private File filteringFile;
     private File resultFile;
 
-    private FileInputStream sourceFileStream;
-    private FileInputStream filteringFileStream;
-    private FileOutputStream resultFileStream;
-
     @FXML
     Label lblF1Name;
 
@@ -32,9 +28,7 @@ public class UIController {
         JFileChooser chooser = getFileChooser();
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             sourceFile = chooser.getSelectedFile();
-            String fileName = sourceFile.getName();
-            //System.out.println("Source File name: " + sourceFile.getAbsolutePath());
-//            lblF1Name.setText(fileName);
+//            System.out.println("Source File name: " + sourceFile.getAbsolutePath());
             lblF1Name.setText(sourceFile.getAbsolutePath());
         }
 
@@ -44,22 +38,24 @@ public class UIController {
         JFileChooser chooser = getFileChooser();
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             filteringFile = chooser.getSelectedFile();
-            String fileName = filteringFile.getName();
-            //System.out.println("Filtering File name: " + filteringFile.getAbsolutePath());
-//            lblF2Name.setText(fileName);
+//            System.out.println("Filtering File name: " + filteringFile.getAbsolutePath());
             lblF2Name.setText(filteringFile.getAbsolutePath());
         }
     }
 
     public void export(ActionEvent event) {
         JFileChooser chooser = getFileChooser();
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if(sourceFile == null || filteringFile == null) {
+            showDialog(Alert.AlertType.ERROR, "Error", "Файлы не выбраны!");
+            return;
+        }
+        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             resultFile = chooser.getSelectedFile();
-            proceedFileConversion(sourceFileStream, filteringFileStream, resultFile);
+            proceedFileConversion(sourceFile, filteringFile, resultFile);
         }
     }
 
-    private void proceedFileConversion(FileInputStream sourceFileStream, FileInputStream filteringFileStream, File resultFile) {
+    private void proceedFileConversion(File sourceFile, File filteringFile, File resultFile) {
         //System.out.println("proceedFileConversion() executing");
         new SubscriberService().handle(sourceFile, filteringFile, resultFile);
         showDialog(Alert.AlertType.INFORMATION, "Info", "Файл сохранен");
@@ -72,12 +68,6 @@ public class UIController {
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         return chooser;
-    }
-
-    private void initFileStreams() throws FileNotFoundException {
-        sourceFileStream = new FileInputStream(sourceFile);
-        filteringFileStream = new FileInputStream(filteringFile);
-        //resultFileStream = new FileOutputStream(resultFile);
     }
 
     private void showDialog(Alert.AlertType alertType, String title, String message) {

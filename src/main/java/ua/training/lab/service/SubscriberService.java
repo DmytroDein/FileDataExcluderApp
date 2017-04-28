@@ -1,6 +1,5 @@
 package ua.training.lab.service;
 
-
 import org.apache.commons.io.FilenameUtils;
 import ua.training.lab.entity.Subscriber;
 import ua.training.lab.parsers.CSVSubscriberParser;
@@ -22,25 +21,11 @@ public class SubscriberService {
     public static final String XLS_EXTENSIONS = "xlsx?";
     public static final String CSV_EXTENSIONS = "csv";
 
-
-    private SubscriberParser subscribersParser;
-    private SubscriberParser unSubscribedParser;
-    private SubscriberSaver subscriberSaver;
-
-    //    public void handle(InputStream subscribersInputStream,
-//                 InputStream unSubscribedInputStream,
-//                 File outputFile) {
     public void handle(File subscribersInputFile,
                        File unSubscribedInputFile,
                        File outputFile) {
-        InputStream subscribersInputStream = openInputStreamFor(subscribersInputFile);
-        InputStream unSubscribedInputStream = openInputStreamFor(unSubscribedInputFile);
-
-        subscribersParser = new CSVSubscriberParser(subscribersInputStream);
-        unSubscribedParser = new XLSSubscriberParser(unSubscribedInputStream);
-
-        Set<Subscriber> subscribers = subscribersParser.getSubscribers();
-        Set<Subscriber> unSubscribed = unSubscribedParser.getSubscribers();
+        Set<Subscriber> subscribers = selectSubscriberParser(subscribersInputFile).getSubscribers();
+        Set<Subscriber> unSubscribed = selectSubscriberParser(unSubscribedInputFile).getSubscribers();
 
         Set<Subscriber> unSubscribedInSubscribers = new HashSet<>(subscribers);
         unSubscribedInSubscribers.retainAll(unSubscribed);
@@ -48,8 +33,18 @@ public class SubscriberService {
         Set<Subscriber> uniqueSubscribers = new HashSet<>(subscribers);
         uniqueSubscribers.removeAll(unSubscribed);
 
-        subscriberSaver = selectSubscriberSaver(outputFile);
-        subscriberSaver.save(uniqueSubscribers, unSubscribedInSubscribers, outputFile);
+        selectSubscriberSaver(outputFile)
+                .save(uniqueSubscribers, unSubscribedInSubscribers, outputFile);
+    }
+
+    private SubscriberParser selectSubscriberParser(File inputFile) {
+        SubscriberParser chosenParser;
+        if (FilenameUtils.getExtension(inputFile.getAbsolutePath()).matches(XLS_EXTENSIONS)) {
+            chosenParser = new XLSSubscriberParser(openInputStreamFor(inputFile));
+        } else {
+            chosenParser = new CSVSubscriberParser(openInputStreamFor(inputFile));
+        }
+        return chosenParser;
     }
 
     private InputStream openInputStreamFor(File file) {
@@ -74,7 +69,7 @@ public class SubscriberService {
         if (FilenameUtils.getExtension(outputFile.getName()).matches("xlsx?")) {
             saver = new XSLSubscriberSaver();
         } else {
-            saver = new CSVSubscriberSaver(outputFile);
+            saver = new CSVSubscriberSaver();
         }
         return saver;
     }
