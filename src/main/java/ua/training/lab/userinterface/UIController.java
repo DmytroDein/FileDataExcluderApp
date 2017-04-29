@@ -5,11 +5,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import ua.training.lab.Runner;
 import ua.training.lab.service.SubscriberService;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
+import java.net.URLDecoder;
 
 public class UIController {
 
@@ -62,12 +64,24 @@ public class UIController {
     }
 
     private JFileChooser getFileChooser(){
-        JFileChooser chooser = new JFileChooser();
+        String currentAppPath = getCurrentAppPath();
+        JFileChooser chooser = new JFileChooser(currentAppPath);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Формат файлов - .xls, .xlsx, .csv.", "xls", "xlsx", "csv");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         return chooser;
+    }
+
+    private String getCurrentAppPath() {
+        String currentAppPath = Runner.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String decodedAppPath = null;
+        try {
+            decodedAppPath = URLDecoder.decode(currentAppPath, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return decodedAppPath;
     }
 
     private void showDialog(Alert.AlertType alertType, String title, String message) {

@@ -14,7 +14,7 @@ public class Runner extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("menu_schema.fxml"));
         Scene scene = new Scene(root, 537, 320);
         primaryStage.setResizable(false);
         primaryStage.setTitle("Welcome to FileDataExcluder");
