@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import org.apache.commons.io.FilenameUtils;
 import ua.training.lab.Runner;
 import ua.training.lab.service.SubscriberService;
 
@@ -15,6 +16,7 @@ import java.net.URLDecoder;
 
 public class UIController {
 
+    private static final String DEFAULT_FILE_EXTENSION = ".csv";
     private File sourceFile;
     private File filteringFile;
     private File resultFile;
@@ -53,8 +55,16 @@ public class UIController {
         }
         if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             resultFile = chooser.getSelectedFile();
+            resultFile = fixFileExtension(resultFile);
             proceedFileConversion(sourceFile, filteringFile, resultFile);
         }
+    }
+
+    private File fixFileExtension(File resultFile) {
+        if (FilenameUtils.getExtension(resultFile.getAbsolutePath()).isEmpty()) {
+            resultFile = new File(resultFile.getName().concat(DEFAULT_FILE_EXTENSION));
+        }
+        return resultFile;
     }
 
     private void proceedFileConversion(File sourceFile, File filteringFile, File resultFile) {
