@@ -12,7 +12,6 @@ import ua.training.lab.savers.XSLSubscriberSaver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UnknownFormatConversionException;
@@ -38,35 +37,25 @@ public class SubscriberService {
     }
 
     private SubscriberParser selectSubscriberParser(File inputFile) {
-        SubscriberParser chosenParser;
-        if (FilenameUtils.getExtension(inputFile.getAbsolutePath()).matches(XLS_EXTENSIONS)) {
-            chosenParser = new XLSSubscriberParser(openInputStreamFor(inputFile));
-        } else {
-            chosenParser = new CSVSubscriberParser(openInputStreamFor(inputFile));
-        }
-        return chosenParser;
-    }
-
-    private InputStream openInputStreamFor(File file) {
-        InputStream resultStream = null;
-        String fileExtension = FilenameUtils.getExtension(file.getAbsolutePath());
+        SubscriberParser chosenParser = null;
         try {
+            String fileExtension = FilenameUtils.getExtension(inputFile.getAbsolutePath());
             if (fileExtension.matches(XLS_EXTENSIONS)) {
-                resultStream = new FileInputStream(file);
+                chosenParser = new XLSSubscriberParser(new FileInputStream(inputFile));
             } else if (fileExtension.matches(CSV_EXTENSIONS)) {
-                resultStream = new FileInputStream(file);
+                chosenParser = new CSVSubscriberParser(new FileInputStream(inputFile));
             } else {
-                throw new UnknownFormatConversionException("Incorrect file type chosen" + file.toString());
+                throw new UnknownFormatConversionException("Incorrect file type chosen" + inputFile.toString());
             }
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
-        return resultStream;
+        return chosenParser;
     }
 
     private SubscriberSaver selectSubscriberSaver(File outputFile) {
         SubscriberSaver saver;
-        if (FilenameUtils.getExtension(outputFile.getName()).matches("xlsx?")) {
+        if (FilenameUtils.getExtension(outputFile.getName()).matches(XLS_EXTENSIONS)) {
             saver = new XSLSubscriberSaver();
         } else {
             saver = new CSVSubscriberSaver();
